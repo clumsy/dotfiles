@@ -1,1 +1,16 @@
+# ignore everything unless explicitly disabled
+/*
+
+# git-specific
+!.gitignore
+
+# common
+!symlinks.sh
+!LICENSE
+
+# WezTerm
+!.wezterm.lua
+
+# Helix Editor
+!.config/helix
 .config/helix/runtime

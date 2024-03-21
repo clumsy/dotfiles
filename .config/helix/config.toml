@@ -46,5 +46,6 @@ C-r = ":reload-all"
 space = "file_picker"
 c = ":bc"
 
-[keys.select]
-l ={l= ":pipe ~/.config/helix/openai.py"}
+[keys.select.c]
+o = ":pipe ~/.config/helix/openai.py"
+b = ":pipe ~/.config/helix/bedrock.py"

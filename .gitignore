@@ -12,5 +12,5 @@
 !.wezterm.lua
 
 # Helix Editor
-!.config/helix
+!.config/helix/*
 .config/helix/runtime

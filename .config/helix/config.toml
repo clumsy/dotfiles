@@ -1,13 +1,10 @@
 theme = "nord"
 
 [editor]
-line-number = "relative"
 mouse = true
-rulers = [120]
-auto-format = true
-cursorline = true
-color-modes = true
+line-number = "relative"
 bufferline = "multiple"
+rulers = [120]
 
 [editor.lsp]
 display-messages = true
@@ -41,9 +38,12 @@ pagedown = "no_op"
 home = "no_op"
 end = "no_op"
 
+[keys.normal]
+esc = ["collapse_selection", "keep_primary_selection"]
+C-r = ":reload-all"
+
 [keys.normal.space]
 space = "file_picker"
-esc = ["collapse_selection", "keep_primary_selection"]
 c = ":bc"
 
 [keys.select]

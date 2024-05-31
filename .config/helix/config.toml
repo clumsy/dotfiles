@@ -14,6 +14,14 @@ display-inlay-hints = true
 render = true
 character = "⋮"
 
+[editor.whitespace.characters]
+space = "·"
+nbsp = "⍽"
+nnbsp = "␣"
+tab = "→"
+newline = "⏎"
+tabpad = "·" # Tabs will look like "→···" (depending on tab width)
+
 [editor.cursor-shape]
 insert = "bar"
 normal = "block"
@@ -48,7 +56,9 @@ C-r = ":reload-all"
 [keys.normal.space]
 space = "file_picker"
 c = ":bc"
+Z = ":set-option whitespace.render all"
+z = ":set-option whitespace.render none"
 
-[keys.select.c]
+[keys.select.l]
 o = ":pipe ~/.config/helix/openai.py"
 b = ":pipe ~/.config/helix/bedrock.py"

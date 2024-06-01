@@ -1,3 +1,5 @@
+use-grammars = { only = [ "mojo" ] }
+
 [[language]]
 name = "rust"
 scope = "source.rust"
@@ -70,3 +72,26 @@ mccabe = { enabled = false }
 pycodestyle = { enabled = false }
 pyflakes = { enabled = false }
 yapf = { enabled = false }
+
+# mojo installation
+# hx --grammar fetch
+# cd ~/.config/helix
+# mkdir -p runtime/queries/mojo/
+# cp -r runtime/grammars/sources/mojo/runtime/queries/mojo/* runtime/queries/mojo/
+# hx --grammar build
+# [language-server]
+# mojo = { command = "mojo-lsp-server" }
+
+[[language]]
+name = "mojo"
+scope = "source.mojo"
+roots = []
+injection-regex = "mojo"
+file-types = ["mojo", "🔥"]
+comment-token = "#"
+indent = { tab-width = 4, unit = "    " }
+language-servers = [ "mojo" ]
+
+[[grammar]]
+name = "mojo"
+source = { git = "https://github.com/garam-kim1/tree-sitter-mojo", rev = "46f89a2a6554789d534faf56e4ce2ebb3a1a5160" }

@@ -1,0 +1,4 @@
+(
+    page_up: Some(( code: Char('u'), modifiers: "CONTROL")),
+    page_down: Some(( code: Char('d'), modifiers: "CONTROL")),
+)

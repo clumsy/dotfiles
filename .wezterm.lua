@@ -9,22 +9,28 @@ local config = wezterm.config_builder()
 -- For example, changing the color scheme:
 config.color_scheme = 'nord'
 config.font = wezterm.font 'Fira Code Retina'
+
+local act = wezterm.action
 config.keys = {
+-- Map Ctrl+W to delete the current word
+  {
+    key = "w",
+    mods = "CTRL",
+    action = wezterm.action.SendString '\x17',
+  },
+-- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
   {
     key = 'LeftArrow',
     mods = 'OPT',
     action = wezterm.action.SendString '\x1bb',
   },
+-- Make Option-Right equivalent to Alt-f; forward-word
   {
     key = 'RightArrow',
     mods = 'OPT',
     action = wezterm.action.SendString '\x1bf',
   },
-}
-
 -- Change tab name
-local act = wezterm.action
-config.keys = {
   {
     key = 'E',
     mods = 'CTRL|SHIFT',

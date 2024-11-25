@@ -58,6 +58,7 @@ space = "file_picker"
 c = ":bc"
 Z = ":set-option whitespace.render all"
 z = ":set-option whitespace.render none"
+B = ":pipe-to wezterm cli split-pane -- helix-git-blame"
 
 [keys.select.l]
 o = ":pipe ~/.config/helix/openai.py"

@@ -46,6 +46,8 @@ config.keys = {
       end),
     },
   },
+-- close split pane
+  --{key="c", mods="CTRL|SHIFT", action=wezterm.action.CloseCurrentPane},
 }
 
 -- and finally, return the configuration to wezterm

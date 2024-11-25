@@ -1,15 +1,50 @@
 use-grammars = { only = [ "mojo" ] }
 
+# AI
+[language-server.lsp-ai]
+command = "lsp-ai"
+
+[language-server.lsp-ai.config.memory]
+file_store = {}
+
+[language-server.lsp-ai.config.models.model1]
+type = "ollama"
+model = "codellama"
+
+[[language-server.lsp-ai.config.chat]]
+action_display_name = "AI chat ✨"
+trigger = "#C"
+model = "model1"
+
+[language-server.lsp-ai.config.chat.parameters]
+max_context = 4096
+max_tokens = 1024
+
+[[language-server.lsp-ai.config.chat.parameters.messages]]
+role = "system"
+content = "You are a code assistant chatbot. The user will ask you for assistance coding and you will do you best to answer succinctly and accurately"
+
+[language-server.lsp-ai.config.completion]
+trigger = "!C"
+model = "model1"
+
+[language-server.lsp-ai.config.completion.parameters]
+max_context = 2000
+options = { num_predict = 128 }
+
 [[language]]
 name = "rust"
 scope = "source.rust"
 injection-regex = "rust"
 file-types = ["rs"]
 roots = ["Cargo.toml", "Cargo.lock"]
-auto-format = true
-comment-token = "//"
+# auto-format = true
+# comment-token = "//"
 indent = { tab-width = 4, unit = "    " }
-language-servers = [ "rust-analyzer" ]
+language-servers = [
+  "lsp-ai",
+  "rust-analyzer"
+]
 
 [language-server.rust-analyzer]
 command = "rust-analyzer"
@@ -54,11 +89,18 @@ request = "attach"
 completion = [ { name = "lldb connect url", default = "connect://localhost:3333" }, { name = "file", completion = "filename" }, "pid" ]
 args = { attachCommands = [ "platform select remote-gdb-server", "platform connect {0}", "file {1}", "attach {2}" ] }
 
+[language-server.ruff-lsp]
+command = "ruff-lsp"
+
 [[language]]
 name = "python"
 roots = ["pyproject.toml", "setup.py", "poetry.lock", "pyrightconfig.json"]
-language-servers = ["pylsp"]
-auto-format = true
+language-servers = [
+  "ruff-lsp",
+  "lsp-ai",
+  "pylsp"
+]
+# auto-format = true
 
 [language-server.pylsp.config.pylsp.plugins]
 pylint = { enabled = true }

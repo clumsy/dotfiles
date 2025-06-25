@@ -1,37 +1,5 @@
 use-grammars = { only = [ "mojo" ] }
 
-# AI
-[language-server.lsp-ai]
-command = "lsp-ai"
-
-[language-server.lsp-ai.config.memory]
-file_store = {}
-
-[language-server.lsp-ai.config.models.model1]
-type = "ollama"
-model = "codellama"
-
-[[language-server.lsp-ai.config.chat]]
-action_display_name = "AI chat ✨"
-trigger = "#C"
-model = "model1"
-
-[language-server.lsp-ai.config.chat.parameters]
-max_context = 4096
-max_tokens = 1024
-
-[[language-server.lsp-ai.config.chat.parameters.messages]]
-role = "system"
-content = "You are a code assistant chatbot. The user will ask you for assistance coding and you will do you best to answer succinctly and accurately"
-
-[language-server.lsp-ai.config.completion]
-trigger = "!C"
-model = "model1"
-
-[language-server.lsp-ai.config.completion.parameters]
-max_context = 2000
-options = { num_predict = 128 }
-
 [[language]]
 name = "rust"
 scope = "source.rust"
@@ -42,7 +10,6 @@ roots = ["Cargo.toml", "Cargo.lock"]
 # comment-token = "//"
 indent = { tab-width = 4, unit = "    " }
 language-servers = [
-  "lsp-ai",
   "rust-analyzer"
 ]
 
@@ -97,21 +64,20 @@ name = "python"
 roots = ["pyproject.toml", "setup.py", "poetry.lock", "pyrightconfig.json"]
 language-servers = [
   "ruff-lsp",
-  "lsp-ai",
   "pylsp"
 ]
 # auto-format = true
 
 [language-server.pylsp.config.pylsp.plugins]
-pylint = { enabled = true }
+pylint = { enabled = false }
 pylsp-mypy = { enabled = true }
 isort = { enabled = true, profile = "black" }
 ruff = { enabled = true, ignore = ["F401"], lineLength = 120 }
 black = { enabled = true, line_length = 120 }
-flake8 = { enabled = true }
+flake8 = { enabled = true, maxLineLength = 120 }
 autopep8 = { enabled = false }
 mccabe = { enabled = false }
-pycodestyle = { enabled = false }
+pycodestyle = { enabled = false, maxLineLength = 120  }
 pyflakes = { enabled = false }
 yapf = { enabled = false }
 
@@ -124,16 +90,17 @@ yapf = { enabled = false }
 # [language-server]
 # mojo = { command = "mojo-lsp-server" }
 
-[[language]]
-name = "mojo"
-scope = "source.mojo"
-roots = []
-injection-regex = "mojo"
-file-types = ["mojo", "🔥"]
-comment-token = "#"
-indent = { tab-width = 4, unit = "    " }
-language-servers = [ "mojo" ]
+# [[language]]
+# name = "mojo"
+# scope = "source.mojo"
+# roots = []
+# injection-regex = "mojo"
+# file-types = ["mojo", "🔥"]
+# comment-token = "#"
+# indent = { tab-width = 4, unit = "    " }
+# language-servers = [ "mojo" ]
 
-[[grammar]]
-name = "mojo"
-source = { git = "https://github.com/garam-kim1/tree-sitter-mojo", rev = "46f89a2a6554789d534faf56e4ce2ebb3a1a5160" }
+# [[grammar]]
+# name = "mojo"
+# source = { git = "https://github.com/garam-kim1/tree-sitter-mojo", rev = "46f89a2a6554789d534faf56e4ce2ebb3a1a5160" }
+

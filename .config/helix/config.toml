@@ -5,6 +5,7 @@ mouse = true
 line-number = "relative"
 bufferline = "multiple"
 rulers = [120]
+text-width = 120
 # Minimum severity to show a diagnostic after the end of a line:
 end-of-line-diagnostics = "hint"
 

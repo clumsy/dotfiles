@@ -1,5 +1,6 @@
 -- Pull in the wezterm API
 local wezterm = require 'wezterm'
+local mux = wezterm.mux
 
 -- This will hold the configuration.
 local config = wezterm.config_builder()
@@ -10,6 +11,17 @@ local act = wezterm.action
 -- For example, changing the color scheme:
 config.color_scheme = 'nord'
 config.font = wezterm.font 'Fira Code Retina'
+config.use_fancy_tab_bar = true
+config.tab_max_width = 32
+config.colors = {
+  tab_bar = {
+    active_tab = {
+      fg_color = '#073642',
+      bg_color = '#2aa198',
+    },
+  },
+}
+config.switch_to_last_active_tab_when_closing_tab = true
 config.unix_domains = {
   {
     name = 'unix',
@@ -106,6 +118,66 @@ config.keys = {
       size = { Percent = 50 },
     },
   },
+  -- Zoom in on a page
+  {
+    key = 'f',
+    mods = 'LEADER',
+    action = wezterm.action.TogglePaneZoomState,
+  },
+  -- Create new tab
+  {
+    key = 'c',
+    mods = 'LEADER',
+    action = act.SpawnTab 'CurrentPaneDomain',
+  },
+  -- CTRL + (h,j,k,l) to move between panes
+  {
+      key = 'h',
+      mods = 'CTRL',
+      action = act({ EmitEvent = "move-left" }),
+  },
+  {
+      key = 'j',
+      mods = 'CTRL',
+      action = act({ EmitEvent = "move-down" }),
+  },
+  {
+      key = 'k',
+      mods = 'CTRL',
+      action = act({ EmitEvent = "move-up" }),
+  },
+  {
+      key = 'l',
+      mods = 'CTRL',
+      action = act({ EmitEvent = "move-right" }),
+  },
+  -- ALT + (h,j,k,l) to resize panes
+  {
+      key = 'h',
+      mods = 'ALT',
+      action = act({ EmitEvent = "resize-left" }),
+  },
+  {
+      key = 'j',
+      mods = 'ALT',
+      action = act({ EmitEvent = "resize-down" }),
+  },
+  {
+      key = 'k',
+      mods = 'ALT',
+      action = act({ EmitEvent = "resize-up" }),
+  },
+  {
+      key = 'l',
+      mods = 'ALT',
+      action = act({ EmitEvent = "resize-right" }),
+  },
+  -- Close/kill active pane
+  {
+      key = 'x',
+      mods = 'LEADER',
+      action = act.CloseCurrentPane { confirm = true },
+  },
   --  Switch to previous pane
   {
     key = ';',
@@ -133,7 +205,7 @@ config.keys = {
   -- Rename current session; analagous to command in tmux
   {
     key = '$',
-    mods = 'LEADER|SHIFT',
+    mods = 'LEADER',
     action = act.PromptInputLine {
       description = 'Enter new name for session',
       action = wezterm.action_callback(

@@ -38,13 +38,13 @@ config.window_padding = {
   bottom = 0,
 }
 
-config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
+config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 200 }
 config.keys = {
-  -- Map Ctrl+W to delete the current word
+  -- Ensure Ctrl+D is passed through (for EOF/scrolling)
   {
-    key = "w",
+    key = "d",
     mods = "CTRL",
-    action = act.SendString '\x17',
+    action = act.SendKey { key = "d", mods = "CTRL" },
   },
   -- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
   {

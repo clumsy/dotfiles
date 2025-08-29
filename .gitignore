@@ -11,6 +11,9 @@
 # WezTerm
 !.wezterm.lua
 
+# Warp
+!.warp/themes/*
+
 # Helix Editor
 !.config/helix/*
 .config/helix/runtime

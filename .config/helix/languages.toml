@@ -70,7 +70,7 @@ language-servers = [
 
 [language-server.pylsp.config.pylsp.plugins]
 pylint = { enabled = false }
-pylsp-mypy = { enabled = true }
+pylsp-mypy = { enabled = true, live_mode = false, overrides = ["--follow-imports=skip", "--no-incremental", "--cache-dir=/tmp/mypy_cache"] }
 isort = { enabled = true, profile = "black" }
 ruff = { enabled = true, ignore = ["F401"], lineLength = 120 }
 black = { enabled = true, line_length = 120 }

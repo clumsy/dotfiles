@@ -59,18 +59,22 @@ args = { attachCommands = [ "platform select remote-gdb-server", "platform conne
 [language-server.ruff-lsp]
 command = "ruff-lsp"
 
+[language-server.ty]
+command = "ty"
+args = ["server"]
+
 [[language]]
 name = "python"
 roots = ["pyproject.toml", "setup.py", "poetry.lock", "pyrightconfig.json"]
 language-servers = [
   "ruff-lsp",
+  "ty",
   "pylsp"
 ]
-# auto-format = true
+auto-format = true
 
 [language-server.pylsp.config.pylsp.plugins]
 pylint = { enabled = false }
-pylsp-mypy = { enabled = true, live_mode = false, overrides = ["--follow-imports=skip", "--no-incremental", "--cache-dir=/tmp/mypy_cache"] }
 isort = { enabled = true, profile = "black" }
 ruff = { enabled = true, ignore = ["F401"], lineLength = 120 }
 black = { enabled = true, line_length = 120 }

@@ -75,6 +75,7 @@ auto-format = true
 
 [language-server.pylsp.config.pylsp.plugins]
 pylint = { enabled = false }
+mypy = { enabled = false }
 isort = { enabled = true, profile = "black" }
 ruff = { enabled = true, ignore = ["F401"], lineLength = 120 }
 black = { enabled = true, line_length = 120 }

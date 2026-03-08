@@ -11,13 +11,29 @@ local act = wezterm.action
 -- For example, changing the color scheme:
 config.color_scheme = 'nord'
 config.font = wezterm.font 'Fira Code Retina'
-config.use_fancy_tab_bar = true
+config.use_fancy_tab_bar = false
 config.tab_max_width = 32
 config.colors = {
   tab_bar = {
     active_tab = {
       fg_color = '#073642',
       bg_color = '#2aa198',
+    },
+    inactive_tab = {
+      fg_color = '#d8dee9',
+      bg_color = '#3b4252',
+    },
+    inactive_tab_hover = {
+      fg_color = '#eceff4',
+      bg_color = '#4c566a',
+    },
+    new_tab = {
+      fg_color = '#d8dee9',
+      bg_color = '#2e3440',
+    },
+    new_tab_hover = {
+      fg_color = '#eceff4',
+      bg_color = '#4c566a',
     },
   },
 }
@@ -38,7 +54,7 @@ config.window_padding = {
   bottom = 0,
 }
 
-config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 200 }
+config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
 config.keys = {
   -- Ensure Ctrl+D is passed through (for EOF/scrolling)
   {
@@ -228,13 +244,69 @@ config.keys = {
   },
 }
 
-wezterm.on('format-tab-title', function(tab)
-  -- Prefer tab_title if set, otherwise fall back to the pane title
+wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_width)
   local title = tab.tab_title
   if title and #title > 0 then
-    return { { Text = ' ' .. title .. ' ' } }
+    title = title
+  else
+    title = tab.active_pane.title
   end
-  return { { Text = ' ' .. tab.active_pane.title .. ' ' } }
+
+  -- Per-tab colors based on tab index or title
+  local bg_color = '#3b4252'
+  local fg_color = '#d8dee9'
+  
+  if tab.is_active then
+    bg_color = '#2aa198'
+    fg_color = '#073642'
+  elseif hover then
+    bg_color = '#4c566a'
+    fg_color = '#eceff4'
+  end
+
+  return {
+    { Background = { Color = bg_color } },
+    { Foreground = { Color = fg_color } },
+    { Attribute = { Intensity = 'Bold' } },
+    { Text = (tab.tab_index + 1) .. '|' .. title },
+    { Background = { Color = '#2e3440' } },
+    { Foreground = { Color = '#4c566a' } },
+    { Text = '⋮' },
+  }
+end)
+
+-- Pane navigation handlers
+wezterm.on('move-left', function(window, pane)
+  window:perform_action(act.ActivatePaneDirection('Left'), pane)
+end)
+
+wezterm.on('move-down', function(window, pane)
+  window:perform_action(act.ActivatePaneDirection('Down'), pane)
+end)
+
+wezterm.on('move-up', function(window, pane)
+  window:perform_action(act.ActivatePaneDirection('Up'), pane)
+end)
+
+wezterm.on('move-right', function(window, pane)
+  window:perform_action(act.ActivatePaneDirection('Right'), pane)
+end)
+
+-- Pane resize handlers
+wezterm.on('resize-left', function(window, pane)
+  window:perform_action(act.AdjustPaneSize({'Left', 5}), pane)
+end)
+
+wezterm.on('resize-down', function(window, pane)
+  window:perform_action(act.AdjustPaneSize({'Down', 5}), pane)
+end)
+
+wezterm.on('resize-up', function(window, pane)
+  window:perform_action(act.AdjustPaneSize({'Up', 5}), pane)
+end)
+
+wezterm.on('resize-right', function(window, pane)
+  window:perform_action(act.AdjustPaneSize({'Right', 5}), pane)
 end)
 
 -- and finally, return the configuration to wezterm

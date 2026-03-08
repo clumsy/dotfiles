@@ -252,10 +252,14 @@ config.keys = {
 
 wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_width)
   local title = tab.tab_title
-  if title and #title > 0 then
-    title = title
-  else
-    title = tab.active_pane.title
+  -- If no custom title set, use current directory name
+  if not title or #title == 0 then
+    local cwd = tab.active_pane.current_working_dir
+    if cwd then
+      title = cwd.file_path:match("([^/]+)/?$") or cwd.file_path
+    else
+      title = tab.active_pane.title
+    end
   end
 
   -- Per-tab colors based on tab index or title

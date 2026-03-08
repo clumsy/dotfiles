@@ -56,6 +56,12 @@ config.window_padding = {
 
 config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
 config.keys = {
+  -- Clear scrollback
+  {
+    key = 'k',
+    mods = 'CMD',
+    action = act.ClearScrollback 'ScrollbackAndViewport',
+  },
   -- Ensure Ctrl+D is passed through (for EOF/scrolling)
   {
     key = "d",

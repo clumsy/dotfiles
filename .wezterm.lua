@@ -14,6 +14,7 @@ config.font = wezterm.font 'Fira Code Retina'
 config.use_fancy_tab_bar = false
 config.tab_max_width = 32
 config.colors = {
+  split = '#88c0d0',  -- Nord8 - frost blue
   tab_bar = {
     active_tab = {
       fg_color = '#073642',
@@ -43,7 +44,12 @@ config.unix_domains = {
     name = 'unix',
   },
 }
-config.pane_focus_follows_mouse = true
+config.inactive_pane_hsb = {
+  saturation = 0.8,
+  brightness = 0.6,
+}
+
+
 config.scrollback_lines = 5000
 
 -- I don't really have need for padding between panes

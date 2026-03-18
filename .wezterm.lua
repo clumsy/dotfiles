@@ -10,11 +10,19 @@ local act = wezterm.action
 
 -- For example, changing the color scheme:
 config.color_scheme = 'nord'
+-- config.window_background_gradient = {
+--   orientation = { Linear = { angle = 225.0 } },
+--   colors = { '#2e3440', '#2e3440', '#323844', '#2e3440', '#2e3440' },
+--   interpolation = 'Linear',
+--   blend = 'Rgb',
+-- }
 config.font = wezterm.font 'Fira Code Retina'
 config.use_fancy_tab_bar = false
 config.tab_max_width = 32
 config.colors = {
-  split = '#88c0d0',  -- Nord8 - frost blue
+  split = '#88c0d0',
+  visual_bell = '#88c0d0',
+  scrollbar_thumb = '#4c566a',
   tab_bar = {
     active_tab = {
       fg_color = '#073642',
@@ -43,6 +51,14 @@ config.default_cursor_style = 'BlinkingBar'
 config.window_decorations = 'RESIZE'
 config.freetype_load_target = 'Light'
 config.freetype_render_target = 'HorizontalLcd'
+-- config.window_background_opacity = 0.95
+-- config.macos_window_background_blur = 20
+config.enable_scroll_bar = true
+config.visual_bell = {
+  fade_in_duration_ms = 75,
+  fade_out_duration_ms = 75,
+  target = 'BackgroundColor',
+}
 config.switch_to_last_active_tab_when_closing_tab = true
 config.unix_domains = {
   {

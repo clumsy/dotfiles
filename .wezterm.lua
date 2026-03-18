@@ -38,6 +38,11 @@ config.colors = {
     },
   },
 }
+config.hide_tab_bar_if_only_one_tab = true
+config.default_cursor_style = 'BlinkingBar'
+config.window_decorations = 'RESIZE'
+config.freetype_load_target = 'Light'
+config.freetype_render_target = 'HorizontalLcd'
 config.switch_to_last_active_tab_when_closing_tab = true
 config.unix_domains = {
   {

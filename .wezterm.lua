@@ -289,9 +289,15 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
     end
   end
 
+  -- Truncate long titles
+  local max_title = max_width - 4 -- account for index prefix and separator
+  if #title > max_title and #title > 12 then
+    title = title:sub(1, max_title - 1) .. '…'
+  end
+
   -- Per-tab colors based on tab index or title
   local bg_color = '#3b4252'
-  local fg_color = '#d8dee9'
+  local fg_color = '#8896a8'
   
   if tab.is_active then
     bg_color = '#2aa198'
@@ -301,14 +307,26 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
     fg_color = '#eceff4'
   end
 
+  if tab.is_active then
+    return {
+      { Background = { Color = '#2e3440' } },
+      { Foreground = { Color = '#ffffff' } },
+      { Text = '⋮' },
+      { Background = { Color = bg_color } },
+      { Foreground = { Color = fg_color } },
+      { Attribute = { Intensity = 'Bold' } },
+      { Text = (tab.tab_index + 1) .. '|' .. title },
+    }
+  end
+
   return {
+    { Background = { Color = '#2e3440' } },
+    { Foreground = { Color = '#4c566a' } },
+    { Text = '⋮' },
     { Background = { Color = bg_color } },
     { Foreground = { Color = fg_color } },
     { Attribute = { Intensity = 'Bold' } },
     { Text = (tab.tab_index + 1) .. '|' .. title },
-    { Background = { Color = '#2e3440' } },
-    { Foreground = { Color = '#4c566a' } },
-    { Text = '⋮' },
   }
 end)
 

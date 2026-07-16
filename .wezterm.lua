@@ -17,6 +17,11 @@ config.color_scheme = 'nord'
 --   blend = 'Rgb',
 -- }
 config.font = wezterm.font 'Fira Code Retina'
+-- Respect emoji/text presentation selectors (e.g. VS16 U+FE0F) so that
+-- dual-presentation glyphs like the info icon (U+2139 + U+FE0F, "info")
+-- render as full-size color emoji instead of a tiny monochrome text glyph
+-- that FiraCode provides at 1-cell width. Requires unicode_version >= 14.
+config.unicode_version = 14
 config.use_fancy_tab_bar = false
 config.tab_max_width = 32
 config.colors = {

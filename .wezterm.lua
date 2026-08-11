@@ -16,7 +16,15 @@ config.color_scheme = 'nord'
 --   interpolation = 'Linear',
 --   blend = 'Rgb',
 -- }
-config.font = wezterm.font 'Fira Code Retina'
+-- Explicit chain: CoreText's automatic fallback missed the installed CJK fonts.
+config.font = wezterm.font_with_fallback {
+  'Fira Code Retina',           -- primary; ligatures, Latin only
+  'JetBrains Mono',             -- WezTerm builtin; ligatures, Latin/symbol gaps
+  'Hiragino Sans GB',           -- Simplified Chinese
+  'Hiragino Kaku Gothic ProN',  -- Japanese kana + halfwidth forms
+  'Apple SD Gothic Neo',        -- Korean
+  'Arial Unicode MS',           -- last: broad coverage, no ligatures
+}
 -- Respect emoji/text presentation selectors (e.g. VS16 U+FE0F) so that
 -- dual-presentation glyphs like the info icon (U+2139 + U+FE0F, "info")
 -- render as full-size color emoji instead of a tiny monochrome text glyph

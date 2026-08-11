@@ -102,12 +102,6 @@ config.keys = {
     mods = 'CMD',
     action = act.ClearScrollback 'ScrollbackAndViewport',
   },
-  -- Ensure Ctrl+D is passed through (for EOF/scrolling)
-  {
-    key = "d",
-    mods = "CTRL",
-    action = act.SendKey { key = "d", mods = "CTRL" },
-  },
   -- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
   {
     key = 'LeftArrow',
@@ -192,7 +186,12 @@ config.keys = {
     mods = 'LEADER',
     action = act.SpawnTab 'CurrentPaneDomain',
   },
-  -- CTRL + (h,j,k,l) to move between panes
+  -- CTRL + (h,j,k,l) to move between panes.
+  -- The handlers below are process-aware: when the foreground program needs
+  -- these keys itself (Helix, vim, less, TUIs), the keystroke is passed
+  -- through instead of navigating panes. This returns Ctrl+h (Helix
+  -- backspace), Ctrl+j (newline), etc. to the editor while keeping pane
+  -- navigation in shells. (Kept on CTRL so Cmd+K clear-scrollback is unaffected.)
   {
       key = 'h',
       mods = 'CTRL',
@@ -343,21 +342,44 @@ wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_wid
   }
 end)
 
--- Pane navigation handlers
+-- Pane navigation handlers (process-aware).
+-- If the pane's foreground program is one that needs Ctrl+h/j/k/l for itself,
+-- forward the keystroke to it; otherwise use the key to switch panes.
+-- Note: get_foreground_process_name() may return nil for remote/mux panes;
+-- in that case we fall through to pane navigation.
+local passthrough_procs = {
+  ['hx'] = true, ['nvim'] = true, ['vim'] = true, ['vi'] = true,
+  ['less'] = true, ['more'] = true, ['man'] = true, ['nano'] = true,
+  ['fzf'] = true, ['sk'] = true, ['btop'] = true, ['htop'] = true,
+  ['gitui'] = true, ['lazygit'] = true, ['bat'] = true, ['emacs'] = true,
+}
+
+local function nav_or_passthrough(window, pane, direction, key)
+  local proc = pane:get_foreground_process_name()
+  if proc then
+    proc = proc:gsub('.*[/\\]', '') -- basename
+    if passthrough_procs[proc] then
+      window:perform_action(act.SendKey { key = key, mods = 'CTRL' }, pane)
+      return
+    end
+  end
+  window:perform_action(act.ActivatePaneDirection(direction), pane)
+end
+
 wezterm.on('move-left', function(window, pane)
-  window:perform_action(act.ActivatePaneDirection('Left'), pane)
+  nav_or_passthrough(window, pane, 'Left', 'h')
 end)
 
 wezterm.on('move-down', function(window, pane)
-  window:perform_action(act.ActivatePaneDirection('Down'), pane)
+  nav_or_passthrough(window, pane, 'Down', 'j')
 end)
 
 wezterm.on('move-up', function(window, pane)
-  window:perform_action(act.ActivatePaneDirection('Up'), pane)
+  nav_or_passthrough(window, pane, 'Up', 'k')
 end)
 
 wezterm.on('move-right', function(window, pane)
-  window:perform_action(act.ActivatePaneDirection('Right'), pane)
+  nav_or_passthrough(window, pane, 'Right', 'l')
 end)
 
 -- Pane resize handlers

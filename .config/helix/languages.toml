@@ -1,5 +1,3 @@
-use-grammars = { only = [ "mojo" ] }
-
 [[language]]
 name = "rust"
 scope = "source.rust"
@@ -28,9 +26,12 @@ args = ["run", "stable", "rust-analyzer"]
 '`' = '`'
 
 [language.debugger]
-name = "lldb-vscode"
+name = "lldb-dap"
 transport = "stdio"
-command = "lldb-vscode"
+# lldb-dap ships with the Xcode Command Line Tools but is not on PATH by default.
+# Absolute path avoids a "not found in $PATH" health error. Alternatives:
+#   /opt/homebrew/opt/llvm/bin/lldb-dap (brew llvm), or install codelldb.
+command = "/Library/Developer/CommandLineTools/usr/bin/lldb-dap"
 
 [[language.debugger.templates]]
 name = "binary"
@@ -56,8 +57,18 @@ request = "attach"
 completion = [ { name = "lldb connect url", default = "connect://localhost:3333" }, { name = "file", completion = "filename" }, "pid" ]
 args = { attachCommands = [ "platform select remote-gdb-server", "platform connect {0}", "file {1}", "attach {2}" ] }
 
-[language-server.ruff-lsp]
-command = "ruff-lsp"
+# ruff 0.13 has a native LSP built in ("ruff server"). ruff-lsp is deprecated
+# (EOL since ruff 0.5). One server now handles linting, import sorting and
+# formatting; ty handles type checking. pylsp removed as fully redundant.
+[language-server.ruff]
+command = "ruff"
+args = ["server"]
+
+# Preserves the line-length / ignore rules you previously set via pylsp.
+# (Project-level pyproject.toml or ruff.toml still takes precedence when present.)
+[language-server.ruff.config.settings]
+lineLength = 120
+lint = { ignore = ["F401"] }
 
 [language-server.ty]
 command = "ty"
@@ -67,24 +78,11 @@ args = ["server"]
 name = "python"
 roots = ["pyproject.toml", "setup.py", "poetry.lock", "pyrightconfig.json"]
 language-servers = [
-  "ruff-lsp",
+  { name = "ruff", except-features = ["hover"] },
   "ty",
-  "pylsp"
 ]
 auto-format = true
-
-[language-server.pylsp.config.pylsp.plugins]
-pylint = { enabled = false }
-mypy = { enabled = false }
-isort = { enabled = true, profile = "black" }
-ruff = { enabled = true, ignore = ["F401"], lineLength = 120 }
-black = { enabled = true, line_length = 120 }
-flake8 = { enabled = true, maxLineLength = 120 }
-autopep8 = { enabled = false }
-mccabe = { enabled = false }
-pycodestyle = { enabled = false, maxLineLength = 120  }
-pyflakes = { enabled = false }
-yapf = { enabled = false }
+formatter = { command = "ruff", args = ["format", "-"] }
 
 # mojo installation
 # hx --grammar fetch

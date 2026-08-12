@@ -6,6 +6,10 @@ local mux = wezterm.mux
 local config = wezterm.config_builder()
 local act = wezterm.action
 
+-- Session persistence: save/restore windows, tabs and panes across restarts.
+-- First load git-clones the plugin, so it needs network and may briefly block.
+local resurrect = wezterm.plugin.require 'https://github.com/StephenGemin/resurrect.wezterm'
+
 -- This is where you actually apply your config choices
 
 -- For example, changing the color scheme:
@@ -398,6 +402,18 @@ end)
 wezterm.on('resize-right', function(window, pane)
   window:perform_action(act.AdjustPaneSize({'Right', 5}), pane)
 end)
+
+-- Enable session persistence. Called last so it appends its keybindings to the
+-- fully-built config.keys (verified: setup() uses table.insert, never replaces).
+-- Adds: Alt+W save workspace, Alt+S save workspace+window, Alt+Shift+W/T save
+-- window/tab, Alt+R fuzzy restore, Alt+D fuzzy delete, Alt+Shift+N new workspace.
+-- Autosaves on focus loss + every 5 min, restores last session on startup, and
+-- shows the last save time in the right status bar.
+resurrect.setup(config, {
+  save_on_focus_loss = true,
+  -- Relaunch these on restore (added to the built-in vim/nvim/less/... allowlist).
+  safe_restore_processes = { add = { 'hx', 'btop', 'gitui' } },
+})
 
 -- and finally, return the configuration to wezterm
 return config

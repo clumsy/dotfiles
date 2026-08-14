@@ -403,16 +403,56 @@ wezterm.on('resize-right', function(window, pane)
   window:perform_action(act.AdjustPaneSize({'Right', 5}), pane)
 end)
 
--- Enable session persistence. Called last so it appends its keybindings to the
--- fully-built config.keys (verified: setup() uses table.insert, never replaces).
--- Adds: Alt+W save workspace, Alt+S save workspace+window, Alt+Shift+W/T save
--- window/tab, Alt+R fuzzy restore, Alt+D fuzzy delete, Alt+Shift+N new workspace.
--- Autosaves on focus loss + every 5 min, restores last session on startup, and
--- shows the last save time in the right status bar.
-resurrect.setup(config, {
-  save_on_focus_loss = true,
-  -- Relaunch these on restore (added to the built-in vim/nvim/less/... allowlist).
-  safe_restore_processes = { add = { 'hx', 'btop', 'gitui' } },
+-- Session persistence, wired manually instead of via resurrect.setup().
+-- setup() unconditionally registers event_driven_save (which hooks
+-- pane-focus-changed + window-focus-changed) and periodic_save, with no opt-out.
+-- That serialized the whole multi-MB state on every pane switch and every
+-- alt-tab. Below: NO periodic save, NO focus/pane-driven save. State is written
+-- only on an explicit quit (Cmd+Q) or a manual save (Alt+W).
+
+-- Restore the last saved workspace on startup.
+wezterm.on('gui-startup', resurrect.state_manager.resurrect_on_gui_startup)
+
+-- Cap saved scrollback per pane; keeps the state file small and saves fast.
+resurrect.state_manager.set_max_nlines(1000)
+
+-- Relaunch these on restore (added to the built-in vim/nvim/less/... allowlist).
+resurrect.pane_tree.add_safe_restore_processes { 'hx', 'btop', 'gitui' }
+
+local function save_session(window)
+  resurrect.state_manager.save_state(resurrect.workspace_state.get_workspace_state())
+  if window then
+    resurrect.state_manager.save_state(resurrect.window_state.get_window_state(window:mux_window()))
+  end
+end
+
+-- Save once on exit: intercept Cmd+Q so state is written, then quit.
+table.insert(config.keys, {
+  key = 'q',
+  mods = 'CMD',
+  action = wezterm.action_callback(function(window, pane)
+    save_session(window)
+    window:perform_action(act.QuitApplication, pane)
+  end),
+})
+
+-- Manual save / restore / delete.
+table.insert(config.keys, {
+  key = 'w',
+  mods = 'ALT',
+  action = wezterm.action_callback(function(window, _pane)
+    save_session(window)
+  end),
+})
+table.insert(config.keys, {
+  key = 'r',
+  mods = 'ALT',
+  action = resurrect.fuzzy_loader.restore_action(),
+})
+table.insert(config.keys, {
+  key = 'd',
+  mods = 'ALT',
+  action = resurrect.fuzzy_loader.delete_action(),
 })
 
 -- and finally, return the configuration to wezterm

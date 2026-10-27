@@ -1,0 +1,85 @@
+[[language]]
+name = "rust"
+scope = "source.rust"
+injection-regex = "rust"
+file-types = ["rs"]
+roots = ["Cargo.toml", "Cargo.lock"]
+# auto-format = true
+# comment-token = "//"
+indent = { tab-width = 4, unit = "    " }
+language-servers = [
+  "rust-analyzer"
+]
+
+[language-server.rust-analyzer]
+command = "rust-analyzer"
+
+[language-server.rust-analyzer.config]
+command = "rustup"
+args = ["run", "stable", "rust-analyzer"]
+
+[language.auto-pairs]
+'(' = ')'
+'{' = '}'
+'[' = ']'
+'"' = '"'
+'`' = '`'
+
+[language.debugger]
+name = "lldb-dap"
+transport = "stdio"
+# lldb-dap ships with the Xcode Command Line Tools but is not on PATH by default.
+# Absolute path avoids a "not found in $PATH" health error. Alternatives:
+#   /opt/homebrew/opt/llvm/bin/lldb-dap (brew llvm), or install codelldb.
+command = "/Library/Developer/CommandLineTools/usr/bin/lldb-dap"
+
+[[language.debugger.templates]]
+name = "binary"
+request = "launch"
+completion = [ { name = "binary", completion = "filename" } ]
+args = { program = "{0}" }
+
+[[language.debugger.templates]]
+name = "binary (terminal)"
+request = "launch"
+completion = [ { name = "binary", completion = "filename" } ]
+args = { program = "{0}", runInTerminal = true }
+
+[[language.debugger.templates]]
+name = "attach"
+request = "attach"
+completion = ["pid"]
+args = { pid = "{0}" }
+
+[[language.debugger.templates]]
+name = "gdbserver attach"
+request = "attach"
+completion = [ { name = "lldb connect url", default = "connect://localhost:3333" }, { name = "file", completion = "filename" }, "pid" ]
+args = { attachCommands = [ "platform select remote-gdb-server", "platform connect {0}", "file {1}", "attach {2}" ] }
+
+# ruff 0.13 has a native LSP built in ("ruff server"). ruff-lsp is deprecated
+# (EOL since ruff 0.5). One server now handles linting, import sorting and
+# formatting; ty handles type checking. pylsp removed as fully redundant.
+[language-server.ruff]
+command = "ruff"
+args = ["server"]
+
+# Preserves the line-length / ignore rules you previously set via pylsp.
+# (Project-level pyproject.toml or ruff.toml still takes precedence when present.)
+[language-server.ruff.config.settings]
+lineLength = 120
+lint = { ignore = ["F401"] }
+
+[language-server.ty]
+command = "ty"
+args = ["server"]
+
+[[language]]
+name = "python"
+roots = ["pyproject.toml", "setup.py", "poetry.lock", "pyrightconfig.json"]
+language-servers = [
+  { name = "ruff", except-features = ["hover"] },
+  "ty",
+]
+auto-format = true
+formatter = { command = "ruff", args = ["format", "-"] }

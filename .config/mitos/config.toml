@@ -1,0 +1,121 @@
+# Ported from ~/.config/helix/config.toml using Mitos' canonical setting names.
+# Mitos ships a newer nord than the old custom copy in helix/themes (it adds
+# ui.cursor.match and rainbow), so the built-in theme is used directly.
+theme = "nord"
+
+[editor]
+line-number = "relative"
+text-width = 120
+# Snappier LSP/diagnostic updates (default 250ms).
+idle-timeout = 50
+
+[editor.mouse]
+enable = true
+
+[editor.bufferline]
+show = "multiple"
+
+[editor.rulers]
+columns = [120]
+
+# Highlight the cursor's line (renders ui.cursorline.primary from the theme).
+[editor.cursor]
+highlight-line = true
+
+[editor.cursor.shape]
+insert = "bar"
+normal = "block"
+select = "underline"
+
+# Snappier completion (defaults: 250ms / 2 chars). In Helix idle-timeout also
+# drove completion; Mitos has a dedicated delay.
+[editor.completion]
+trigger-delay = 50
+trigger-length = 1
+
+[editor.diagnostics.end-of-line]
+# Minimum severity to show a diagnostic after the end of a line.
+severity = "hint"
+
+[editor.diagnostics.inline]
+# Minimum severity to show a diagnostic on the primary cursor's line.
+# Note that `cursor-line` diagnostics are hidden in insert mode.
+cursor-line = "error"
+# Minimum severity to show a diagnostic on other lines:
+# other-lines = "error"
+
+[editor.lsp.messages]
+enable = true
+
+[editor.lsp.inlay-hints]
+enable = true
+
+[editor.lsp.signature-help]
+show-documentation = false
+
+[editor.indent-guides]
+render = true
+character = "⋮"
+
+[editor.whitespace.characters]
+space = "·"
+nbsp = "⍽"
+nnbsp = "␣"
+tab = "→"
+newline = "⏎"
+tabpad = "·" # Tabs will look like "→···" (depending on tab width)
+
+[editor.statusline]
+# Mitos has no `center` section; Helix's center elements follow on the left.
+left = ["mode", "spinner", "file-name", "branch"]
+right = ["diagnostics", "selections", "position-percentage", "position", "file-encoding", "file-line-ending", "file-type"]
+separator = "│"
+# Recolor the mode segment per mode (ui.statusline.{normal,insert,select}).
+mode.color = true
+mode.normal = "NORMAL"
+mode.insert = "INSERT"
+mode.select = "SELECT"
+
+[editor.file-picker]
+hidden = false
+
+# Native replacement for the old `Space l` blame echo: blame for the cursor's
+# line at the end of that line. `Space B` (below) still opens full-file blame.
+[editor.inline-blame]
+show = "cursor-line"
+
+# Keep files clean on save.
+[editor.files.save]
+trim-trailing-whitespace = true
+
+# Auto-save on focus loss and after a short idle delay.
+[editor.files.auto-save]
+focus-lost = true
+after-delay.enable = true
+after-delay.timeout = 3000
+
+[keys.insert]
+up = "no_op"
+down = "no_op"
+left = "no_op"
+right = "no_op"
+pageup = "no_op"
+pagedown = "no_op"
+home = "no_op"
+end = "no_op"
+
+[keys.normal]
+esc = ["collapse_selection", "keep_primary_selection"]
+C-r = ":reload-all"
+# With the bufferline shown, quick buffer switching (Mitos defaults: gp/gn).
+H = "goto_previous_buffer"
+L = "goto_next_buffer"
+
+[keys.normal.space]
+space = "file_picker"
+# Overrides Mitos' Space c (toggle comments), as in the Helix config.
+c = ":bc"
+Z = ":set-option whitespace.render all"
+z = ":set-option whitespace.render none"
+# Overrides Mitos' Space B (toggle_inline_blame) with full-file blame in a pane.
+B = ":pipe-to wezterm cli split-pane -- helix-git-blame"

@@ -216,25 +216,25 @@ config.keys = {
       mods = 'CTRL',
       action = act({ EmitEvent = "move-right" }),
   },
-  -- ALT + (h,j,k,l) to resize panes
+  -- CTRL+ALT + (h,j,k,l) to resize panes (plain ALT is left for Mitos/Helix)
   {
       key = 'h',
-      mods = 'ALT',
+      mods = 'CTRL|ALT',
       action = act({ EmitEvent = "resize-left" }),
   },
   {
       key = 'j',
-      mods = 'ALT',
+      mods = 'CTRL|ALT',
       action = act({ EmitEvent = "resize-down" }),
   },
   {
       key = 'k',
-      mods = 'ALT',
+      mods = 'CTRL|ALT',
       action = act({ EmitEvent = "resize-up" }),
   },
   {
       key = 'l',
-      mods = 'ALT',
+      mods = 'CTRL|ALT',
       action = act({ EmitEvent = "resize-right" }),
   },
   -- Close/kill active pane
@@ -356,18 +356,34 @@ local passthrough_procs = {
   ['less'] = true, ['more'] = true, ['man'] = true, ['nano'] = true,
   ['fzf'] = true, ['sk'] = true, ['btop'] = true, ['htop'] = true,
   ['gitui'] = true, ['lazygit'] = true, ['bat'] = true, ['emacs'] = true,
+  ['rusticity'] = true,
 }
 
-local function nav_or_passthrough(window, pane, direction, key)
-  local proc = pane:get_foreground_process_name()
-  if proc then
-    proc = proc:gsub('.*[/\\]', '') -- basename
-    if passthrough_procs[proc] then
-      window:perform_action(act.SendKey { key = key, mods = 'CTRL' }, pane)
-      return
-    end
+-- Kiro's shell wrapper owns the outer PTY; the actual TUI runs on an inner
+-- PTY. Inspect descendants only for that wrapper, not for ordinary shells.
+local function has_passthrough_process(info)
+  if not info or info.status == 'Stop' or info.status == 'Zombie' or info.status == 'Dead' then
+    return false
   end
-  window:perform_action(act.ActivatePaneDirection(direction), pane)
+  local name = (info.executable or ''):gsub('.*[/\\]', '')
+  if passthrough_procs[name] then return true end
+  for _, child in pairs(info.children or {}) do
+    if has_passthrough_process(child) then return true end
+  end
+  return false
+end
+
+local function nav_or_passthrough(window, pane, direction, key)
+  local proc = (pane:get_foreground_process_name() or ''):gsub('.*[/\\]', '')
+  local forward = passthrough_procs[proc]
+  if not forward and proc:find('(kiro-cli-term)', 1, true) then
+    forward = has_passthrough_process(pane:get_foreground_process_info())
+  end
+  if forward then
+    window:perform_action(act.SendKey { key = key, mods = 'CTRL' }, pane)
+  else
+    window:perform_action(act.ActivatePaneDirection(direction), pane)
+  end
 end
 
 wezterm.on('move-left', function(window, pane)
@@ -408,7 +424,7 @@ end)
 -- pane-focus-changed + window-focus-changed) and periodic_save, with no opt-out.
 -- That serialized the whole multi-MB state on every pane switch and every
 -- alt-tab. Below: NO periodic save, NO focus/pane-driven save. State is written
--- only on an explicit quit (Cmd+Q) or a manual save (Alt+W).
+-- only on an explicit quit (Cmd+Q) or a manual save (Ctrl+Alt+W).
 
 -- Restore the last saved workspace on startup.
 wezterm.on('gui-startup', resurrect.state_manager.resurrect_on_gui_startup)
@@ -439,19 +455,19 @@ table.insert(config.keys, {
 -- Manual save / restore / delete.
 table.insert(config.keys, {
   key = 'w',
-  mods = 'ALT',
+  mods = 'CTRL|ALT',
   action = wezterm.action_callback(function(window, _pane)
     save_session(window)
   end),
 })
 table.insert(config.keys, {
   key = 'r',
-  mods = 'ALT',
+  mods = 'CTRL|ALT',
   action = resurrect.fuzzy_loader.restore_action(),
 })
 table.insert(config.keys, {
   key = 'd',
-  mods = 'ALT',
+  mods = 'CTRL|ALT',
   action = resurrect.fuzzy_loader.delete_action(),
 })
 
